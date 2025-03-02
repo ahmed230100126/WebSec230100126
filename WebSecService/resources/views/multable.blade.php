@@ -2,7 +2,7 @@
 @section('title', 'multiplication Table')
 @section('content')
    
-@php($j = 5)
+@php( $j = $number ) 
 <div class="card m-4 col-sm-2">
 <div class="card-header">{{$j}} Multiplication Table</div>
 <div class="card-body">
