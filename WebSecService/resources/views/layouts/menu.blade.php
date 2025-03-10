@@ -29,6 +29,15 @@
 <li class="nav-item">
     <a class="nav-link" href="{{ route('grades.index') }}">Grades</a>
 </li>
-</ul>
+</ul>   
+    <ul class="navbar-nav ml-auto">
+        @auth
+            <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">{{ auth()->user()->name }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('doLogout') }}">Logout</a></li>
+        @else
+            <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
+        @endauth
+    </ul>
 </div>
 </nav>

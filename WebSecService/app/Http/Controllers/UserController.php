@@ -3,9 +3,15 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 
 class UserController extends Controller
 {
+    use ValidatesRequests;
+
     public function index(Request $request)
     {
         $query = User::query();
@@ -36,7 +42,7 @@ class UserController extends Controller
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => ($request->password), // Hash the password
+            'password' => Hash::make($request->password), // Hash the password
             'phone' => $request->phone,
         ]);
 
@@ -65,5 +71,78 @@ class UserController extends Controller
     {
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully');
+    }
+
+    public function register(Request $request)
+    {
+        return view('users.register');
+    }
+
+    public function doRegister(Request $request)
+    {
+        $this->validate($request, [
+            'name' => ['required', 'string', 'min:5'],
+            'email' => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'confirmed', Password::min(8)->numbers()->letters()->mixedCase()->symbols()],
+        ]);
+
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password); // Secure
+        $user->save();
+
+        return redirect("/");
+    }
+
+    public function login(Request $request)
+    {
+        return view('users.login');
+    }
+
+    public function doLogin(Request $request)
+    {
+        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            return redirect()->back()->withInput($request->input())->withErrors('Invalid login information.');
+        }
+        $user = User::where('email', $request->email)->first();
+        Auth::setUser($user);
+        return redirect("/");
+    }
+
+    public function doLogout(Request $request)
+    {
+        Auth::logout();
+        return redirect('/');
+    }
+
+    public function profile(User $user = null)
+    {
+        $user = $user ?? Auth::user();
+        return view('users.profile', compact('user'));
+    }
+
+    public function updatePassword(Request $request, User $user = null)
+    {
+        $user = $user ?? Auth::user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => ['required', 'confirmed', Password::min(8)->numbers()->letters()->mixedCase()->symbols()],
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return back()->with('success', 'Password updated successfully');
+    }
+
+    public function edit(User $user)
+    {
+        return view('users.edit', compact('user'));
     }
 }

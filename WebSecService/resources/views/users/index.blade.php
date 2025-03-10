@@ -34,14 +34,17 @@
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->phone }}</td>
                         <td>
-                            <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ route('users.destroy', $user) }}" method="POST" 
-                                  class="d-inline" 
-                                  onsubmit="return confirm('Are you sure?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
+                            <a href="{{ route('profile', $user->id) }}" class="btn btn-sm btn-info">View</a>
+                            @if(auth()->user()->admin)
+                                <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <form action="{{ route('users.destroy', $user) }}" method="POST" 
+                                      class="d-inline" 
+                                      onsubmit="return confirm('Are you sure?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

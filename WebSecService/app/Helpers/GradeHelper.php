@@ -11,7 +11,7 @@ if (!function_exists('calculateGPA')) {
                 'C' => 2,
                 'D' => 1,
                 'F' => 0,
-                default => 0,
+                default => 0
             };
             $totalPoints += $points * $grade->credit_hours;
             $totalCreditHours += $grade->credit_hours;
