@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use Spatie\Permission\Models\Permission;
 
 class ProductsController extends Controller
 {
@@ -43,6 +44,10 @@ class ProductsController extends Controller
 
     public function delete(Request $request, Product $product)
     {
+        // Ensure the permission exists
+        Permission::firstOrCreate(['name' => 'delete_products']);
+        
+        if(!auth()->user()->hasPermissionTo('delete_products')) abort(401);
         $product->delete();
         return redirect()->route('products_list');
     }

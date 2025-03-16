@@ -6,12 +6,12 @@
         <h1>Products</h1>
     </div>
     <div class="col col-2">
-        @auth
+        @can('add_products')
             <a href="{{ route('products_edit') }}" class="btn btn-success form-control">Add Product</a>
-        @endauth
+        @endcan
     </div>
 </div>
-<form>
+<form method="GET" action="{{ route('products_list') }}">
     <div class="row">
         <div class="col col-sm-2">
             <input name="keywords" type="text" class="form-control" placeholder="Search Keywords" value="{{ request()->keywords }}" />
@@ -59,16 +59,18 @@
                         <tr><th>Code</th><td>{{ $product->code }}</td></tr>
                         <tr><th>Description</th><td>{{ $product->description }}</td></tr>
                     </table>
-                    @auth
-                        <div class="row mb-2">
+                    <div class="row mb-2">
+                        @can('edit_products')
                             <div class="col col-2">
                                 <a href="{{ route('products_edit', $product->id) }}" class="btn btn-success form-control">Edit</a>
                             </div>
+                        @endcan
+                        @can('delete_products')
                             <div class="col col-2">
                                 <a href="{{ route('products_delete', $product->id) }}" class="btn btn-danger form-control">Delete</a>
                             </div>
-                        </div>
-                    @endauth
+                        @endcan
+                    </div>
                 </div>
             </div>
         </div>

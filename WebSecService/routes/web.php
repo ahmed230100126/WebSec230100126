@@ -33,6 +33,7 @@ Route::get('test/{id}', function ($id) {
 
 Route::resource('users', UserController::class);
 Route::resource('grades', GradeController::class);
+
 Route::get('products', [ProductsController::class, 'list'])->name('products_list');
 Route::get('products/edit/{product?}', [ProductsController::class, 'edit'])->name('products_edit');
 Route::post('products/save/{product?}', [ProductsController::class, 'save'])->name('products_save');
@@ -46,3 +47,5 @@ Route::get('profile/{user?}', [UserController::class, 'profile'])->name('profile
 Route::post('profile/update-password/{user?}', [UserController::class, 'updatePassword'])->name('updatePassword')->middleware('auth');
 Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit')->middleware('auth');
 Route::put('users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('auth');
+Route::get('users/edit/{user?}', [UserController::class, 'edit'])->name('users_edit')->middleware('auth');
+Route::post('users/save/{user}', [UserController::class, 'save'])->name('users_save')->middleware('auth');

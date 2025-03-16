@@ -5,8 +5,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Artisan; // Add this line
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -69,6 +72,10 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if (!auth()->user()->hasPermissionTo('delete_users')) {
+            abort(403);
+        }
+
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully');
     }
@@ -91,6 +98,15 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->password = bcrypt($request->password); // Secure
         $user->save();
+
+        // Assign admin role and permissions
+        $role = Role::firstOrCreate(['name' => 'admin']);
+        $permissions = ['add_products', 'edit_products', 'delete_products'];
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+        $role->syncPermissions($permissions);
+        $user->assignRole($role);
 
         return redirect("/");
     }
@@ -116,10 +132,69 @@ class UserController extends Controller
         return redirect('/');
     }
 
-    public function profile(User $user = null)
+    public function profile(Request $request, User $user = null)
     {
-        $user = $user ?? Auth::user();
-        return view('users.profile', compact('user'));
+        $user = $user ?? auth()->user();
+        if (auth()->id() != $user?->id) {
+            if (!auth()->user()->hasPermissionTo('show_users')) abort(401);
+        }
+
+        $permissions = [];
+        foreach ($user->permissions as $permission) {
+            $permissions[] = $permission;
+        }
+        foreach ($user->roles as $role) {
+            foreach ($role->permissions as $permission) {
+                $permissions[] = $permission;
+            }
+        }
+
+        return view('users.profile', compact('user', 'permissions'));
+    }
+
+    public function edit(Request $request, User $user = null)
+    {
+        $user = $user ?? auth()->user();
+        if (auth()->id() != $user?->id) {
+            if (!auth()->user()->hasPermissionTo('edit_users')) abort(401);
+        }
+
+        $roles = [];
+        foreach (Role::all() as $role) {
+            $role->taken = ($user->hasRole($role->name));
+            $roles[] = $role;
+        }
+
+        $permissions = [];
+        $directPermissionsIds = $user->permissions()->pluck('id')->toArray();
+        foreach (Permission::all() as $permission) {
+            $permission->taken = in_array($permission->id, $directPermissionsIds);
+            $permissions[] = $permission;
+        }
+
+        return view('users.edit', compact('user', 'roles', 'permissions'));
+    }
+
+    public function save(Request $request, User $user)
+    {
+        if (auth()->id() != $user->id) {
+            if (!auth()->user()->hasPermissionTo('edit_users')) abort(401);
+        }
+
+        $user->name = $request->name;
+        $user->save();
+
+        if (auth()->user()->hasPermissionTo('edit_users')) {
+            $roles = Role::whereIn('id', $request->roles)->pluck('id')->toArray();
+            $user->syncRoles($roles);
+
+            $permissions = Permission::whereIn('id', $request->permissions)->pluck('id')->toArray();
+            $user->syncPermissions($permissions);
+
+            Artisan::call('cache:clear');
+        }
+
+        return redirect(route('profile', ['user' => $user->id]));
     }
 
     public function updatePassword(Request $request, User $user = null)
@@ -131,6 +206,10 @@ class UserController extends Controller
             'new_password' => ['required', 'confirmed', Password::min(8)->numbers()->letters()->mixedCase()->symbols()],
         ]);
 
+        if (auth()->id() != $user->id && !auth()->user()->hasPermissionTo('change_password')) {
+            abort(401);
+        }
+
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Current password is incorrect']);
         }
@@ -141,8 +220,4 @@ class UserController extends Controller
         return back()->with('success', 'Password updated successfully');
     }
 
-    public function edit(User $user)
-    {
-        return view('users.edit', compact('user'));
-    }
 }
