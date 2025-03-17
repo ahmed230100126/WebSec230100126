@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\Web\ProductsController;
+use App\Http\Controllers\BookController; // Add this line
 
 Route::get('/', function () {
     return view('welcome');
@@ -49,3 +50,9 @@ Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.ed
 Route::put('users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('auth');
 Route::get('users/edit/{user?}', [UserController::class, 'edit'])->name('users_edit')->middleware('auth');
 Route::post('users/save/{user}', [UserController::class, 'save'])->name('users_save')->middleware('auth');
+
+Route::get('books', [BookController::class, 'index'])->name('books.index')->middleware('auth');
+Route::get('books/create', [BookController::class, 'create'])->name('books.create')->middleware('auth');
+Route::post('books', [BookController::class, 'store'])->name('books.store')->middleware('auth');
+Route::get('books/edit/{book}', [BookController::class, 'edit'])->name('books.edit')->middleware('auth');
+Route::post('books/save/{book?}', [BookController::class, 'save'])->name('books.save')->middleware('auth');

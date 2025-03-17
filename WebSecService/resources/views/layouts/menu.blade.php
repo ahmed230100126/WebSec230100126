@@ -26,6 +26,11 @@
 <li class="nav-item">
     <a class="nav-link" href="{{ route('users.index') }}">Users</a>
 </li>
+@auth
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('books.index') }}">Books</a>
+    </li>
+@endauth
 <li class="nav-item">
     <a class="nav-link" href="{{ route('grades.index') }}">Grades</a>
 </li>

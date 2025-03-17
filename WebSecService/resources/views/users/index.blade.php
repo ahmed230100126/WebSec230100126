@@ -7,6 +7,7 @@
         @can('add_user')
             <a href="{{ route('users.create') }}" class="btn btn-success">Add New User</a>
         @endcan
+        <a href="{{ route('books.index') }}" class="btn btn-info">View Books</a>
     </div>
     <div class="card-body">
         <form method="GET" class="mb-4">
