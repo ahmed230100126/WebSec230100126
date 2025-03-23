@@ -5,7 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Artisan; // Add this line
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Spatie\Permission\Models\Role;
@@ -14,6 +14,11 @@ use Spatie\Permission\Models\Permission;
 class UserController extends Controller
 {
     use ValidatesRequests;
+
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['login', 'doLogin', 'register', 'doRegister']);
+    }
 
     public function index(Request $request)
     {
@@ -30,7 +35,8 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('users.create');
+        $roles = Role::all();
+        return view('users.create', compact('roles'));
     }
 
     public function store(Request $request)
@@ -38,14 +44,14 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8', // Require password
+            'password' => 'required|string|min:8',
             'phone' => 'nullable|string|max:20',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password), // Hash the password
+            'password' => Hash::make($request->password),
             'phone' => $request->phone,
         ]);
 
@@ -57,7 +63,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8', // Optional for update
+            'password' => 'nullable|string|min:8',
             'phone' => 'nullable|string|max:20',
         ]);
 
@@ -76,11 +82,15 @@ class UserController extends Controller
             abort(403);
         }
 
+        if (auth()->id() == $user->id) {
+            return back()->with('error', 'You cannot delete your own account');
+        }
+
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully');
     }
 
-    public function register(Request $request)
+    public function register()
     {
         return view('users.register');
     }
@@ -96,7 +106,7 @@ class UserController extends Controller
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->password = bcrypt($request->password); // Secure
+        $user->password = bcrypt($request->password);
         $user->save();
 
         // Assign admin role and permissions
@@ -111,7 +121,7 @@ class UserController extends Controller
         return redirect("/");
     }
 
-    public function login(Request $request)
+    public function login()
     {
         return view('users.login');
     }
@@ -129,6 +139,8 @@ class UserController extends Controller
     public function doLogout(Request $request)
     {
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect('/');
     }
 
@@ -219,5 +231,4 @@ class UserController extends Controller
 
         return back()->with('success', 'Password updated successfully');
     }
-
 }

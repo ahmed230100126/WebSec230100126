@@ -1,30 +1,25 @@
 @extends('layouts.master')
-@section('title', 'transcript')
+@section('title', 'Student Transcript')
 @section('content')
-   
-<div class="container mt-5">
-    <h2 class="text-center">Student Transcript</h2>
-    <table class="table table-bordered mt-4">
-        <thead class="table-dark">
-            <tr>
-                <th>Course Name</th>
-                <th>Grade</th>
-            </tr>
+  <div class="card m-4">
+    <div class="card-header">Student Transcript</div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Grade</th>
+          </tr>
         </thead>
         <tbody>
-            @foreach ($courses as $course)
+          @foreach ($transcript as $course => $grade)
             <tr>
-                <td>{{ $course['name'] }}</td>
-                <td>{{ $course['grade'] }}</td>
-                
+              <td>{{ $course }}</td>
+              <td>{{ $grade }}</td>
             </tr>
-            @endforeach
+          @endforeach
         </tbody>
-    </table>
-
-
-    <div class="text-center mt-4">
-        <h4><strong>Total GPA: {{ $gpa }}</strong></h4>
+      </table>
     </div>
-</div>
+  </div>
 @endsection

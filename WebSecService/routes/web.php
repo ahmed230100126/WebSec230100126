@@ -1,58 +1,68 @@
 <?php
-use App\Http\Controllers\TestController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\GradeController;
 use App\Http\Controllers\Web\ProductsController;
-use App\Http\Controllers\BookController; // Add this line
+use App\Http\Controllers\Web\UsersController;
+use App\Http\Controllers\Web\GradeController;
+use App\Http\Controllers\Web\ExamController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/', function () {
-    return view('welcome'); //welcome.blade.php
-    });
-Route::get('multable/{id}', function ($id) {
-    return view('multable' , [
-        'number'=>$id ,
-    ]);
-});
-Route::get('/prime ', function () {
-    return view('prime',);
-});
-
-Route::get('test/{id}', function ($id) {
-    $courses = [
-        '1' => 'englach',
-        '2' => 'oop',
-        '3' => 'ara'
-    ];
-    return view('test' , [
-        'this_id' => $courses[$id] ?? "does not exsist",
-    ]);
-});
-
-Route::resource('users', UserController::class);
-Route::resource('grades', GradeController::class);
+Route::get('register', [UsersController::class, 'register'])->name('register');
+Route::post('register', [UsersController::class, 'doRegister'])->name('do_register');
+Route::get('login', [UsersController::class, 'login'])->name('login');
+Route::post('login', [UsersController::class, 'doLogin'])->name('do_login');
+Route::get('logout', [UsersController::class, 'doLogout'])->name('do_logout');
+Route::get('users', [UsersController::class, 'list'])->name('users');
+Route::get('profile/{user?}', [UsersController::class, 'profile'])->name('profile');
+Route::get('users/edit/{user?}', [UsersController::class, 'edit'])->name('users_edit');
+Route::post('users/save/{user}', [UsersController::class, 'save'])->name('users_save');
+Route::get('users/delete/{user}', [UsersController::class, 'delete'])->name('users_delete');
+Route::get('users/edit_password/{user?}', [UsersController::class, 'editPassword'])->name('edit_password');
+Route::post('users/save_password/{user}', [UsersController::class, 'savePassword'])->name('save_password');
 
 Route::get('products', [ProductsController::class, 'list'])->name('products_list');
 Route::get('products/edit/{product?}', [ProductsController::class, 'edit'])->name('products_edit');
 Route::post('products/save/{product?}', [ProductsController::class, 'save'])->name('products_save');
 Route::get('products/delete/{product}', [ProductsController::class, 'delete'])->name('products_delete');
-Route::get('register',[UserController::class,'register'])->name ('register');
-Route::post('register',[UserController::class,'doRegister'])->name ('doRegister');
-Route::get('login',[UserController::class,'login'])->name ('login');
-Route::post('login',[UserController::class,'doLogin'])->name ('doLogin');
-Route::get('logout',[UserController::class,'doLogout'])->name ('doLogout');
-Route::get('profile/{user?}', [UserController::class, 'profile'])->name('profile')->middleware('auth');
-Route::post('profile/update-password/{user?}', [UserController::class, 'updatePassword'])->name('updatePassword')->middleware('auth');
-Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit')->middleware('auth');
-Route::put('users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('auth');
-Route::get('users/edit/{user?}', [UserController::class, 'edit'])->name('users_edit')->middleware('auth');
-Route::post('users/save/{user}', [UserController::class, 'save'])->name('users_save')->middleware('auth');
 
-Route::get('books', [BookController::class, 'index'])->name('books.index')->middleware('auth');
-Route::get('books/create', [BookController::class, 'create'])->name('books.create')->middleware('auth');
-Route::post('books', [BookController::class, 'store'])->name('books.store')->middleware('auth');
-Route::get('books/edit/{book}', [BookController::class, 'edit'])->name('books.edit')->middleware('auth');
-Route::post('books/save/{book?}', [BookController::class, 'save'])->name('books.save')->middleware('auth');
+Route::resource('grades', GradeController::class);
+
+Route::resource('exam', ExamController::class);
+Route::get('exam/start', [ExamController::class, 'start'])->name('exam.start');
+Route::post('exam/submit', [ExamController::class, 'submit'])->name('exam.submit');
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/multable', function (Request $request) {
+    $j = $request->number??5;
+    $msg = $request->msg;
+    return view('multable', compact("j", "msg"));
+});
+
+Route::get('/even', function () {
+    return view('even');
+});
+
+Route::get('/prime', function () {
+    return view('prime');
+});
+
+Route::get('/test', function () {
+    return view('test');
+});
+
+Route::get('/transcript', function () {
+    $transcript = [
+        'Mathematics' => 'A',
+        'Physics' => 'B+',
+        'Chemistry' => 'A-',
+        'Biology' => 'B',
+        'Computer Science' => 'A+'
+    ];
+    return view('transcript', ['transcript' => $transcript]);
+});
+
+Route::get('/calculator', function () {
+    return view('calculator');
+});
