@@ -5,6 +5,8 @@ use App\Http\Controllers\Web\ProductsController;
 use App\Http\Controllers\Web\UsersController;
 use App\Http\Controllers\Web\GradeController;
 use App\Http\Controllers\Web\ExamController;
+use App\Http\Controllers\Web\QuizController;
+use App\Http\Controllers\Web\SubmissionController;
 
 Route::get('register', [UsersController::class, 'register'])->name('register');
 Route::post('register', [UsersController::class, 'doRegister'])->name('do_register');
@@ -29,6 +31,16 @@ Route::resource('grades', GradeController::class);
 Route::resource('exam', ExamController::class);
 Route::get('exam/start', [ExamController::class, 'start'])->name('exam.start');
 Route::post('exam/submit', [ExamController::class, 'submit'])->name('exam.submit');
+
+Route::middleware(['auth'])->group(function () {
+    // Quiz routes
+    Route::resource('quizzes', QuizController::class);
+    
+    // Submission routes
+    Route::post('quizzes/{quiz}/submit', [SubmissionController::class, 'submit'])->name('submissions.submit');
+    Route::put('submissions/{submission}/grade', [SubmissionController::class, 'grade'])->name('submissions.grade');
+    Route::get('student/results', [SubmissionController::class, 'studentResults'])->name('student.results');
+});
 
 Route::get('/', function () {
     return view('welcome');

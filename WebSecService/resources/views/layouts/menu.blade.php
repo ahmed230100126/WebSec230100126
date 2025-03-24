@@ -32,11 +32,27 @@
         <li class="nav-item">
           <a class="nav-link" href="{{route('products_list')}}">Products</a>
         </li>
-        @can('show_users')
-        <li class="nav-item">
-          <a class="nav-link" href="{{route('users')}}">Users</a>
-        </li>
-        @endcan
+        @auth
+          @if(auth()->user()->hasRole('Instructor'))
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('quizzes.index') }}">My Quizzes</a>
+            </li>
+          @endif
+          
+          @if(auth()->user()->hasRole('Student'))
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('quizzes.index') }}">Available Quizzes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('student.results') }}">My Quiz Results</a>
+            </li>
+          @endif
+          @can('show_users')
+          <li class="nav-item">
+            <a class="nav-link" href="{{route('users')}}">Users</a>
+          </li>
+          @endcan
+        @endauth
       </ul>
       <ul class="navbar-nav ms-auto">
         @auth
