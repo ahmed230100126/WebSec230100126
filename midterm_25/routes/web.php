@@ -28,10 +28,12 @@ Route::middleware(['auth', 'role:Admin|Employee'])->group(function () {
     Route::get('products/edit/{product?}', [ProductsController::class, 'edit'])->name('products_edit');
     Route::post('products/save/{product?}', [ProductsController::class, 'save'])->name('products_save');
     Route::get('products/delete/{product}', [ProductsController::class, 'delete'])->name('products_delete');
+    Route::get('products/{product}/reset', [ProductsController::class, 'resetStock'])->name('products_reset');
 });
 
 Route::get('orders', [OrdersController::class, 'index'])->name('orders.index');
 Route::get('orders/{order}', [OrdersController::class, 'show'])->name('orders.show');
+Route::get('orders/{order}/delete', [OrdersController::class, 'delete'])->name('order_delete');
 
 Route::middleware(['auth', 'role:Customer'])->group(function () {
     // Remove cart routes and keep only the direct purchase route
@@ -39,9 +41,9 @@ Route::middleware(['auth', 'role:Customer'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Admin|Employee'])->group(function () {
-    Route::patch('orders/{order}/status', [OrdersController::class, 'updateStatus'])->name('orders.update.status');
     Route::get('customers/{user}/add-credits', [OrdersController::class, 'addCreditsForm'])->name('add_credits_form');
     Route::post('customers/{user}/add-credits', [OrdersController::class, 'addCredits'])->name('add_credits');
+    Route::get('orders/{order}/cancel', [OrdersController::class, 'cancelOrder'])->name('orders.cancel');
 });
 
 Route::resource('grades', GradeController::class);
@@ -103,6 +105,8 @@ Route::middleware(['auth', 'role:Admin|Employee'])->group(function () {
     Route::get('customers', [UserController::class, 'customers'])->name('users.customers');
     Route::get('customers/{user}/credits', [UserController::class, 'showAddCredits'])->name('users.credits.show');
     Route::post('customers/{user}/credits', [UserController::class, 'addCredits'])->name('users.credits.add');
+    Route::get('customers/{user}/reset-credits', [UserController::class, 'resetCredits'])->name('users.credits.reset');
+    Route::get('customers/delete/{user}', [UserController::class, 'delete'])->name('customers_delete');
 });
 
 // User profile route (moved from old UsersController to new one)

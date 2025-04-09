@@ -44,16 +44,24 @@
                                     @endif
                                     <td>${{ number_format($order->total_amount, 2) }}</td>
                                     <td>
-                                        <span class="badge bg-{{ $order->status == 'pending' ? 'warning' :
-                                                               ($order->status == 'processing' ? 'info' :
-                                                               ($order->status == 'shipped' ? 'primary' :
-                                                               ($order->status == 'delivered' ? 'success' : 'danger'))) }}">
-                                            {{ ucfirst($order->status) }}
+                                        <span class="badge bg-success">
+                                            Purchase Completed
                                         </span>
                                     </td>
                                     <td>
                                         <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-primary">View</a>
+                                        
+                                        @if(Auth::user()->hasAnyRole(['Admin', 'Employee']) && $order->status !== 'Cancelled')
+                                            <a href="{{ route('orders.cancel', $order->id) }}" 
+                                               class="btn btn-sm btn-danger"
+                                               onclick="return confirm('Are you sure you want to cancel this order? This will refund the customer and restore stock.')">
+                                                Cancel Order
+                                            </a>
+                                        @endif
                                     </td>
+                                    {{-- <td>
+                                        <a href="{{ route('order_delete', $order->id) }}" class="btn btn-sm btn-primary">Delete</a>
+                                    </td> --}}
                                 </tr>
                             @endforeach
                         </tbody>

@@ -44,9 +44,11 @@
                                         <a href="{{ route('add_credits_form', $customer) }}" class="btn btn-sm btn-success">
                                             <i class="bi bi-plus-circle"></i> Add Credits
                                         </a>
+
                                         <a href="{{ route('profile', $customer) }}" class="btn btn-sm btn-info">
                                             <i class="bi bi-eye"></i> View Profile
                                         </a>
+                                        {{-- <a class="btn btn-danger" href='{{route('customers_delete', [$customer->id])}}'>Delete</a> --}}
                                     </div>
                                 </td>
                             </tr>

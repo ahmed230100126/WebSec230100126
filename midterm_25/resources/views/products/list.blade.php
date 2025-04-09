@@ -100,6 +100,11 @@
                                                 <a href="{{ route('products_edit', $product) }}" class="btn btn-sm btn-primary">
                                                     <i class="bi bi-pencil"></i> Edit
                                                 </a>
+                                                {{-- <a href="{{ route('products_reset', $product) }}" 
+                                                   class="btn btn-sm btn-warning"
+                                                   onclick="return confirm('Are you sure you want to reset the stock to 0?')">
+                                                    <i class="bi bi-arrow-repeat"></i> Reset
+                                                </a> --}}
                                                 @if(auth()->user()->hasPermissionTo('delete_products'))
                                                     <a href="{{ route('products_delete', $product) }}" 
                                                        class="btn btn-sm btn-danger" 

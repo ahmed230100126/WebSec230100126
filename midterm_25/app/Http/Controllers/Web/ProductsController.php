@@ -80,4 +80,22 @@ class ProductsController extends Controller {
 
 		return redirect()->route('products_list');
 	}
+
+	/**
+	 * Reset product stock to zero
+	 */
+	public function resetStock(Product $product)
+	{
+	    // Check if user has permission (should be Employee or Admin)
+	    if (!auth()->user()->hasAnyRole(['Admin', 'Employee'])) {
+	        abort(403, 'Unauthorized action.');
+	    }
+	    
+	    // Reset stock to zero
+	    $product->stock_quantity = 0;
+	    $product->save();
+	    
+	    return redirect()->route('products_list')
+	        ->with('success', "Stock for {$product->name} has been reset to 0.");
+	}
 }

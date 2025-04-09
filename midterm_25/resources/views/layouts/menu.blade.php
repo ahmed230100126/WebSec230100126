@@ -42,9 +42,9 @@
           @endif
 
           <!-- Orders Link (visible to all authenticated users) -->
-          <li class="nav-item">
+        {{-- <li class="nav-item">
             <a class="nav-link" href="{{ route('orders.index') }}">Orders</a>
-          </li>
+          </li>   --}}
 
           @can('show_users')
           <li class="nav-item">

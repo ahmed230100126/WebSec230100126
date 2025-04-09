@@ -61,7 +61,7 @@ class OrdersController extends Controller
     }
 
     /**
-     * Place an order directly from product page
+     * to complet the order and process payment 
      */
     public function placeOrder(Request $request)
     {
@@ -105,7 +105,7 @@ class OrdersController extends Controller
                 DB::rollBack();
                 return redirect()->route('products_list')->with('error', 'Not enough stock available.');
             }
-
+        
             // Calculate total
             $total = $product->price * $quantity;
 
@@ -119,9 +119,7 @@ class OrdersController extends Controller
             $order = new Order();
             $order->user_id = $user->id;
             $order->total_amount = $total;
-            $order->status = 'pending';
-            $order->shipping_address = $user->address ?? 'Default Shipping Address';
-            $order->billing_address = $user->address ?? 'Default Billing Address';
+            $order->status = 'Purchase Completed';
             $order->save();
 
             // Create order item
@@ -143,25 +141,6 @@ class OrdersController extends Controller
         });
     }
 
-    /**
-     * Update order status (Admin/Employee only)
-     */
-    public function updateStatus(Request $request, Order $order)
-    {
-        // Check permissions
-        if (!Auth::user()->hasAnyRole(['Admin', 'Employee'])) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
-        ]);
-
-        $order->status = $request->status;
-        $order->save();
-
-        return redirect()->back()->with('success', 'Order status updated.');
-    }
 
     /**
      * List all customers (for employees)
@@ -220,5 +199,16 @@ class OrdersController extends Controller
 
         return redirect()->route('list_customers')
             ->with('success', "Successfully added {$request->amount} credits to {$user->name}'s account.");
+    }
+
+    public function delete(Request $request, Order $order)
+    {
+        // Check if user has permission to delete orders
+        if (!auth()->user()->hasPermissionTo('manage_orders')) {
+            abort(401);
+        }
+        $order->delete();
+
+        return redirect()->route('orders.index');
     }
 }

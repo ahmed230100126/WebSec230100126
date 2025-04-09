@@ -89,6 +89,32 @@ class UserController extends Controller
     }
 
     /**
+     * Reset user credits to zero
+     */
+    public function resetCredits(User $user)
+    {
+        // Check if current user has role Admin or Employee
+        if (!Auth::user()->hasAnyRole(['Employee'])) {
+            abort(403, 'Unauthorized action');
+        }
+
+        // Ensure target user is a customer
+        if (!$user->hasRole('Customer')) {
+            return redirect()->back()->with('error', 'Credits can only be reset for customer accounts.');
+        }
+        
+        // Save the current credit amount for the message
+        $oldCredits = $user->credits;
+        
+        // Reset credits to zero
+        $user->credits = 0;
+        $user->save();
+        
+        return redirect()->route('users.customers')
+            ->with('success', "Successfully reset {$user->name}'s credits from \${$oldCredits} to \$0.");
+    }
+
+    /**
      * Show form to create a new employee
      */
     public function createEmployee()
@@ -118,5 +144,24 @@ class UserController extends Controller
 
         return redirect()->route('users')
             ->with('success', 'Employee created successfully.');
+    }
+
+    /**
+     * Delete a customers
+     */
+    public function delete(Request $request, User $user) 
+    {
+
+        // Ensure we're not deleting our own account
+        if(auth()->id() === $user->id) {
+            return redirect()->route('users.customers')
+                ->with('error', 'You cannot delete your own account.');
+        }
+
+        // Delete the user
+        $user->delete();
+
+        return redirect()->route('users.customers')
+            ->with('success', 'User deleted successfully.');
     }
 }

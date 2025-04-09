@@ -31,6 +31,7 @@
 
                         <div class="mb-3">
                             <label for="amount" class="form-label">Amount to Add</label>
+
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="1" required>
@@ -40,7 +41,16 @@
 
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('users.customers') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Add Credits</button>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Add Credits</button>
+                                {{-- @if(auth()->user()->hasAnyRole(['Employee']))
+                                <a href="{{ route('users.credits.reset', $user) }}" 
+                                   class="btn btn-danger ms-2"
+                                   onclick="return confirm('Are you sure you want to reset {{ $user->name }}\'s credits to $0? This action cannot be undone.')">
+                                    <i class="bi bi-x-circle"></i> Reset Credits
+                                </a>
+                                @endif --}}
+                            </div>
                         </div>
                     </form>
                 </div>

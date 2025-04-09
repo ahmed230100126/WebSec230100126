@@ -195,12 +195,12 @@ class UsersController extends Controller {
     public function delete(Request $request, User $user) {
 
         if(!auth()->user()->hasPermissionTo('delete_users')) abort(401);
-
         //$user->delete();
-
+        $user->delete();
         return redirect()->route('users');
     }
 
+    
     public function editPassword(Request $request, User $user = null) {
 
         $user = $user??auth()->user();
