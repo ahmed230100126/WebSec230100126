@@ -60,6 +60,14 @@
                         </div>
                     </form>
                     
+                    <div class="row mt-3">
+                        <div class="col-md-8 offset-md-4">
+                            <a href="{{ route('redirectToFacebook') }}" class="btn btn-primary">
+                                <i class="fab fa-facebook-f mr-2"></i> Login with Facebook
+                            </a>
+                        </div>
+                    </div>
+                    
                     @if (session('error') && strpos(session('error'), 'not verified'))
                     <div class="mt-3">
                         <hr>

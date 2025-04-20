@@ -138,3 +138,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::post('employees/store', [UserController::class, 'storeEmployee'])->name('store_employee');
 });
 
+// Facebook authentication routes
+Route::get('auth/facebook', [UsersController::class, 'redirectToFacebook'])->name('redirectToFacebook');
+Route::get('auth/facebook/callback', [UsersController::class, 'handleFacebookCallback'])->name('facebook.callback');
+

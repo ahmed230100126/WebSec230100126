@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerificationEmail;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -319,4 +321,6 @@ class UsersController extends Controller {
 
         return redirect(route('profile', ['user'=>$user->id]));
     }
+
+   
 }

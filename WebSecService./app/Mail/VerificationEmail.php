@@ -54,7 +54,7 @@ class VerificationEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'email.verification',
+            view: 'emails.verification',
             with: [
                 'link' => $this->link,
                 'name' => $this->name
