@@ -111,11 +111,18 @@ class UsersController extends Controller {
     }
 
     public function doLogin(Request $request) {
-
-    	if(!Auth::attempt(['email' => $request->email, 'password' => $request->password]))
+        
+        if(!Auth::attempt(['email' => $request->email, 'password' => $request->password]))
             return redirect()->back()->withInput($request->input())->withErrors('Invalid login information.');
 
         $user = User::where('email', $request->email)->first();
+        
+
+        if($user->state == "blocked") {
+            Auth::logout(); 
+            return redirect()->back()->withInput($request->except('password'))->withErrors('Cannot login,you are blocked');
+        }
+        
         Auth::setUser($user);
 
         return redirect('/');

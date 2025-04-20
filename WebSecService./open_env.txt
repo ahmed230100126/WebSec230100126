@@ -1,0 +1,4 @@
+php artisan serve
+sudo /opt/lampp/lampp start
+sudo dpkg -i discord-0.0.82.deb
+

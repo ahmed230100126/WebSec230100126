@@ -41,6 +41,9 @@ Route::middleware(['auth', 'role:Customer'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Admin|Employee'])->group(function () {
+ 
+    Route::get('customers/{user}/block', [UserController::class, 'toggleBlockStatus'])->name('block_user');
+    
     Route::get('customers/{user}/add-credits', [OrdersController::class, 'addCreditsForm'])->name('add_credits_form');
     Route::post('customers/{user}/add-credits', [OrdersController::class, 'addCredits'])->name('add_credits');
     Route::get('orders/{order}/cancel', [OrdersController::class, 'cancelOrder'])->name('orders.cancel');
