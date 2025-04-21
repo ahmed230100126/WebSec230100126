@@ -142,3 +142,8 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 Route::get('auth/facebook', [UsersController::class, 'redirectToFacebook'])->name('redirectToFacebook');
 Route::get('auth/facebook/callback', [UsersController::class, 'handleFacebookCallback'])->name('handleFacebookCallback');
 
+Route::get('/auth/google',
+[UsersController::class, 'redirectToGoogle'])->name('login_with_google');
+
+Route::get('/auth/google/callback',[UsersController::class, 'handleGoogleCallback']);
+

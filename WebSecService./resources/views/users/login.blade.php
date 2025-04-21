@@ -64,9 +64,13 @@
                         <div class="col-md-8 offset-md-4">
                             <a href="{{ route('redirectToFacebook') }}" class="btn btn-primary">
                                 <i class="fab fa-facebook-f mr-2"></i> Login with Facebook
+                                
                             </a>
+                            <a href="{{route('login_with_google')}}" class="btn btn-success">Login with
+                                Google</a>
                         </div>
                     </div>
+                  
                 </div>
             </div>
         </div>

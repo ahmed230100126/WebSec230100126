@@ -355,4 +355,42 @@ class UsersController extends Controller {
         }
     }
 
+    public function redirectToGoogle(){
+        return Socialite::driver('google')->redirect();
+    }
+        
+    public function handleGoogleCallback() {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+            
+            // First check if a user with this email exists
+            $user = User::where('email', $googleUser->email)->first();
+            
+            if ($user) {
+                // User exists, just update their Google credentials
+                $user->update([
+                    'google_id' => $googleUser->id,
+                    'google_token' => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken ?? null,
+                ]);
+            } else {
+                // Create a new user if email doesn't exist
+                $user = User::create([
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'password' => Hash::make(Str::random(24)),
+                    'email_verified_at' => now(),
+                    'google_id' => $googleUser->id,
+                    'google_token' => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken ?? null,
+                ]);
+            }
+            
+            Auth::login($user);
+            return redirect('/')->with('success', 'Logged in with Google successfully!');
+        } catch (\Exception $e) {
+            \Log::error('Google login error: ' . $e->getMessage());
+            return redirect('/login')->with('error', 'Google login failed: ' . $e->getMessage());
+        }
+    }  
 }
