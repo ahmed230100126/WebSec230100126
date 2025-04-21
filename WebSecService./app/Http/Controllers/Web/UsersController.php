@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\VerificationEmail;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -324,21 +325,34 @@ class UsersController extends Controller {
 
     public function redirectToFacebook()
     {
-        return Socialite::driver('facebook')->redirect();
+        return Socialite::driver('facebook')
+            ->scopes(['email', 'public_profile'])
+            ->redirect();
     }
 
     public function handleFacebookCallback()
     {
-       $userfacebook = Socialite::driver('facebook')->stateless()->user();
-
-       $user = User::firstorCreate([
-            ['facebook_id' => $userfacebook->getId()],
-           'name' => $userfacebook->getName(),
-           'email' => $userfacebook->getEmail(),
-       ]);
-       $user->assignRole('Customer'); // Assign the Customer role
-       Auth::login($user, true); // Log the user in
-       return redirect('/')->with('success', 'Logged in with Facebook successfully!');
+        try {
+            $userfacebook = Socialite::driver('facebook')->stateless()->user();
+            
+            $user = User::firstOrCreate(
+                // Search criteria
+                ['facebook_id' => $userfacebook->getId()],
+                // Values to create if not found - must also include facebook_id here
+                [
+                    'name' => $userfacebook->getName(),
+                    'email' => $userfacebook->getEmail(),
+                    'password' => Hash::make(Str::random(24)),
+                    'facebook_id' => $userfacebook->getId(), // Add this line to fix the error
+                    'email_verified_at' => now() // Auto-verify Facebook users
+                ]
+            );
+            
+            Auth::login($user);
+            return redirect('/')->with('success', 'Logged in with Facebook successfully!');
+        } catch (\Exception $e) {
+            return redirect('/login')->with('error', 'Facebook authentication failed: ' . $e->getMessage());
+        }
     }
 
 }

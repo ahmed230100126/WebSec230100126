@@ -1,4 +1,4 @@
 php artisan serve
 sudo /opt/lampp/lampp start
 sudo dpkg -i discord-0.0.82.deb
-
+ngrok http http://127.0.0.1:8000

@@ -67,22 +67,6 @@
                             </a>
                         </div>
                     </div>
-                    
-                    @if (session('error') && strpos(session('error'), 'not verified'))
-                    <div class="mt-3">
-                        <hr>
-                        <form method="POST" action="{{ route('resend.verification') }}">
-                            @csrf
-                            <input type="hidden" name="email" value="{{ session('email') ?? old('email') }}">
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-link">
-                                    Resend verification email
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    @endif
-
                 </div>
             </div>
         </div>
