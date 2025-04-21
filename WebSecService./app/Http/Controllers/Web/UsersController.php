@@ -322,5 +322,23 @@ class UsersController extends Controller {
         return redirect(route('profile', ['user'=>$user->id]));
     }
 
-   
+    public function redirectToFacebook()
+    {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    public function handleFacebookCallback()
+    {
+       $userfacebook = Socialite::driver('facebook')->stateless()->user();
+
+       $user = User::firstorCreate([
+            ['facebook_id' => $userfacebook->getId()],
+           'name' => $userfacebook->getName(),
+           'email' => $userfacebook->getEmail(),
+       ]);
+       $user->assignRole('Customer'); // Assign the Customer role
+       Auth::login($user, true); // Log the user in
+       return redirect('/')->with('success', 'Logged in with Facebook successfully!');
+    }
+
 }

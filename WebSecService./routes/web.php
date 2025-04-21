@@ -140,5 +140,5 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
 // Facebook authentication routes
 Route::get('auth/facebook', [UsersController::class, 'redirectToFacebook'])->name('redirectToFacebook');
-Route::get('auth/facebook/callback', [UsersController::class, 'handleFacebookCallback'])->name('facebook.callback');
+Route::get('auth/facebook/callback', [UsersController::class, 'handleFacebookCallback'])->name('handleFacebookCallback');
 
