@@ -11,6 +11,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderConfirmationMail;
 
 class OrdersController extends Controller
 {
@@ -136,11 +138,14 @@ class OrdersController extends Controller
 
             // Deduct credits from user account
             $user->deductCredits($total);
+            
+            // Send order confirmation email
+            $order->load(['items.product', 'user']);
+            Mail::to($user->email)->send(new OrderConfirmationMail($order));
 
             return redirect()->route('orders.show', $order->id)->with('success', 'Your order has been placed successfully! Order #' . $order->id);
         });
     }
-
 
     /**
      * List all customers (for employees)
