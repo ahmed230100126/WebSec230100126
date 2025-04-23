@@ -282,7 +282,19 @@ class UsersController extends Controller {
     public function delete(Request $request, User $user) {
 
         if(!auth()->user()->hasPermissionTo('delete_users')) abort(401);
-        //$user->delete();
+        
+        // Prevent deleting your own account
+        if(auth()->id() === $user->id) {
+            return redirect()->route('users')
+                ->with('error', 'You cannot delete your own account.');
+        }
+        
+        // Prevent admins from deleting other admins
+        if(auth()->user()->hasRole('Admin') && $user->hasRole('Admin')) {
+            return redirect()->route('users')
+                ->with('error', 'Admins cannot delete other admin accounts.');
+        }
+        
         $user->delete();
         return redirect()->route('users');
     }

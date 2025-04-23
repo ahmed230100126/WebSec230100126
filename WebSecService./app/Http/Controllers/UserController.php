@@ -151,11 +151,16 @@ class UserController extends Controller
      */
     public function delete(Request $request, User $user) 
     {
-
         // Ensure we're not deleting our own account
         if(auth()->id() === $user->id) {
             return redirect()->route('users.customers')
                 ->with('error', 'You cannot delete your own account.');
+        }
+        
+        // Prevent admins from deleting other admins
+        if(auth()->user()->hasRole('Admin') && $user->hasRole('Admin')) {
+            return redirect()->route('users.customers')
+                ->with('error', 'Admins cannot delete other admin accounts.');
         }
 
         // Delete the user
