@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -170,9 +172,68 @@ class UserController extends Controller
             ->with('success', 'User deleted successfully.');
     }
 
+    /**
+     * Redirect the user to GitHub authentication page
+     */
+    public function redirectToGithub()
+    {
+        return Socialite::driver('github')->redirect();
+    }
+
+    /**
+     * Handle the callback from GitHub
+     */
+    public function handleGithubCallback()
+    {
+        try {
+            $githubUser = Socialite::driver('github')->user();
+            
+            // Check if this user already exists with this GitHub ID
+            $user = User::where('github_id', $githubUser->getId())->first();
+            
+            if (!$user) {
+                // Check if there's a user with the same email
+                $user = User::where('email', $githubUser->getEmail())->first();
+                
+                if (!$user) {
+                    // Create a new user
+                    $user = User::create([
+                        'name' => $githubUser->getName() ?? $githubUser->getNickname(),
+                        'email' => $githubUser->getEmail(),
+                        'password' => Hash::make(Str::random(16)), // Random password
+                        'github_id' => $githubUser->getId(),
+                        'credits' => 0,
+                        'state' => 'active',
+                    ]);
+                    
+                    // Assign Customer role to new users
+                    $user->assignRole('Customer');
+                } else {
+                    // Update existing user with GitHub ID
+                    $user->github_id = $githubUser->getId();
+                    $user->save();
+                }
+            }
+            
+            // Check if user is blocked
+            if ($user->state === 'blocked') {
+                return redirect()->route('login')
+                    ->with('error', 'Your account has been blocked. Please contact support.');
+            }
+            
+            // Log in the user
+            Auth::login($user);
+            
+            return redirect()->intended('/dashboard');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('login')
+                ->with('error', 'GitHub authentication failed: ' . $e->getMessage());
+        }
+    }
+
     public function toggleBlockStatus(User $user)
     {
-       
         if (!Auth::user()->hasPermissionTo('block_users')) {
             abort(403, 'Unauthorized action');
         }

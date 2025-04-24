@@ -147,3 +147,8 @@ Route::get('/auth/google',
 
 Route::get('/auth/google/callback',[UsersController::class, 'handleGoogleCallback']);
 
+// GitHub OAuth Routes
+Route::get('login/github', [App\Http\Controllers\UserController::class, 'redirectToGithub'])
+    ->name('login.github');
+Route::get('login/github/callback', [App\Http\Controllers\UserController::class, 'handleGithubCallback']);
+

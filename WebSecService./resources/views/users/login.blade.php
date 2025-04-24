@@ -68,6 +68,10 @@
                             </a>
                             <a href="{{route('login_with_google')}}" class="btn btn-success">Login with
                                 Google</a>
+
+                                <a href="{{ route('login.github') }}" class="btn btn-dark btn-block">
+                                    <i class="fab fa-github"></i> Login with GitHub
+                                </a>    
                         </div>
                     </div>
                   
