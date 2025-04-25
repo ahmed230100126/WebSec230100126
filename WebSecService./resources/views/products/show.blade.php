@@ -56,46 +56,8 @@
                                         </a>
                                     @endauth
                                 </div>
-                                
-                                <!-- Store Ranking Display -->
-                                @php
-                                    // Get total likes across all products for comparison
-                                    $totalProductLikes = \App\Models\ProductLike::count();
-                                    $thisProductLikes = $product->likes->count();
-                                    
-                                    // Calculate percentile rank if there are any likes
-                                    if($totalProductLikes > 0) {
-                                        $rank = \App\Models\Product::withCount('likes')
-                                            ->orderByDesc('likes_count')
-                                            ->get()
-                                            ->search(function($rankedProduct) use ($product) {
-                                                return $rankedProduct->id === $product->id;
-                                            }) + 1;
-                                            
-                                        // Get total number of products with at least one like
-                                        $productsWithLikes = \App\Models\Product::has('likes')->count();
-                                        
-                                        // Calculate percentile (higher is better)
-                                        $percentile = $productsWithLikes > 0 
-                                            ? 100 - (($rank / $productsWithLikes) * 100) 
-                                            : 0;
-                                    }
-                                @endphp
-                                
-                                @if($thisProductLikes > 0)
-                                    <div class="mt-2">
-                                        <span class="badge bg-info text-dark">
-                                            <i class="bi bi-trophy"></i> 
-                                            @if(isset($rank) && isset($productsWithLikes))
-                                                Rank #{{ $rank }} of {{ $productsWithLikes }}
-                                                (Top {{ number_format($percentile, 1) }}%)
-                                            @else
-                                                First likes!
-                                            @endif
-                                        </span>
-                                    </div>
-                                @endif
                             </div>
+                            
                             
                             <div class="mb-4">
                                 <h5>Description</h5>

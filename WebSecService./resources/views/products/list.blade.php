@@ -56,7 +56,7 @@
                                             <i class="bi bi-image text-muted"></i>
                                         </div>
                                     @endif
-                                </a>0.29
+                                </a>
                                 
                                 <div class="card-body">
                                     <a href="{{ route('products.show', $product) }}" class="text-decoration-none text-dark">
@@ -81,6 +81,9 @@
                                         <a href="{{ route('products.show', $product) }}" class="badge bg-info text-decoration-none">
                                             <i class="bi bi-chat-text me-1"></i>{{ $product->comments->count() }}
                                         </a>
+                                        <span class="badge bg-danger ms-2">
+                                            <i class="bi bi-heart-fill me-1"></i>{{ $product->likes->count() }}
+                                        </span>
                                     </div>
                                     
                                     <div class="d-flex justify-content-between align-items-center mt-2">
@@ -99,6 +102,26 @@
                                                 @endif
                                             @endif
                                         </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center mt-2">
+                                        <span class="me-2">
+                                            <strong>{{ $product->likes->count() }}</strong>
+                                            <small class="text-muted">{{ Str::plural('like', $product->likes->count()) }}</small>
+                                        </span>
+                                        
+                                        @auth
+                                            <form action="{{ route('products.like', $product) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn {{ $product->isLikedByUser(auth()->user()) ? 'btn-danger' : 'btn-outline-danger' }} btn-sm">
+                                                    <i class="bi {{ $product->isLikedByUser(auth()->user()) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <a href="{{ route('login') }}" class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-heart"></i>
+                                            </a>
+                                        @endauth
                                     </div>
                                     
                                     @if($product->stock_quantity < 1)
