@@ -25,8 +25,7 @@ class ProductCommentsController extends Controller
             ->whereHas('items', function($query) use ($product) {
                 $query->where('product_id', $product->id);
             })
-            ->where('status', 'completed')
-            ->exists();
+            ->exists(); // Removed the status check to allow comments regardless of order status
         
         if (!$hasPurchased) {
             return redirect()->back()->with('error', 'You can only review products you have purchased.');
@@ -39,7 +38,7 @@ class ProductCommentsController extends Controller
         $comment->rating = $request->rating;
         $comment->save();
         
-        return redirect()->route('products.show', $product)->with('success', 'Your comment has been added.');
+        return redirect()->back()->with('success', 'Your comment has been added.');
     }
     
     /**
@@ -55,6 +54,6 @@ class ProductCommentsController extends Controller
         $product = $comment->product;
         $comment->delete();
         
-        return redirect()->route('products.show', $product)->with('success', 'Comment has been deleted.');
+        return redirect()->back()->with('success', 'Comment has been deleted.');
     }
 }

@@ -78,7 +78,6 @@
                     <h5>Write a Review for Your Purchased Products</h5>
                 </div>
                 <div class="card-body">
-                    @if($order->status === 'completed')
                         @foreach($order->items as $item)
                             <div class="border-bottom pb-4 mb-4">
                                 <div class="d-flex mb-3">
@@ -122,12 +121,6 @@
                                 </form>
                             </div>
                         @endforeach
-                    @else
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            You can write reviews for products once your order is completed.
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
