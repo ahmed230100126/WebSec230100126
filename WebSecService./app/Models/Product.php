@@ -68,4 +68,24 @@ class Product extends Model  {
     {
         return $this->hasMany(ProductComment::class);
     }
+    
+    /**
+     * Get the likes for this product.
+     */
+    public function likes()
+    {
+        return $this->hasMany(ProductLike::class);
+    }
+
+    /**
+     * Check if a product is liked by a specific user
+     */
+    public function isLikedByUser($user = null)
+    {
+        if (!$user) {
+            return false;
+        }
+        
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
 }

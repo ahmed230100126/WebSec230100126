@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\SubmissionController;
 use App\Http\Controllers\Web\OrdersController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Web\ProductCommentsController;
+use App\Http\Controllers\Web\ProductLikesController;
 
 Route::get('register', [UsersController::class, 'register'])->name('register');
 Route::post('register', [UsersController::class, 'doRegister'])->name('do_register');
@@ -55,6 +56,9 @@ Route::middleware(['auth', 'role:Admin|Employee'])->group(function () {
 // Product comments
 Route::post('products/{product}/comments', [ProductCommentsController::class, 'store'])->name('product.comments.store');
 Route::delete('/product/comments/{comment}', [ProductCommentsController::class, 'destroy'])->name('product.comments.destroy');
+
+// Product likes
+Route::post('products/{product}/like', [ProductLikesController::class, 'toggleLike'])->name('products.like');
 
 Route::get('orders', [OrdersController::class, 'index'])->name('orders.index');
 Route::get('orders/{order}', [OrdersController::class, 'show'])->name('orders.show');

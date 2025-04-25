@@ -34,6 +34,69 @@
                                 @endif
                             </div>
                             
+                            <!-- Product Likes Section -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <div>
+                                        <strong>{{ $product->likes->count() }}</strong>
+                                        <span class="text-muted">{{ Str::plural('like', $product->likes->count()) }}</span>
+                                    </div>
+                                    
+                                    @auth
+                                        <form action="{{ route('products.like', $product) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn {{ $product->isLikedByUser(auth()->user()) ? 'btn-danger' : 'btn-outline-danger' }} btn-sm">
+                                                <i class="bi {{ $product->isLikedByUser(auth()->user()) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+                                                {{ $product->isLikedByUser(auth()->user()) ? 'Unlike' : 'Like' }}
+                                            </button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('login') }}" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-heart"></i> Like
+                                        </a>
+                                    @endauth
+                                </div>
+                                
+                                <!-- Store Ranking Display -->
+                                @php
+                                    // Get total likes across all products for comparison
+                                    $totalProductLikes = \App\Models\ProductLike::count();
+                                    $thisProductLikes = $product->likes->count();
+                                    
+                                    // Calculate percentile rank if there are any likes
+                                    if($totalProductLikes > 0) {
+                                        $rank = \App\Models\Product::withCount('likes')
+                                            ->orderByDesc('likes_count')
+                                            ->get()
+                                            ->search(function($rankedProduct) use ($product) {
+                                                return $rankedProduct->id === $product->id;
+                                            }) + 1;
+                                            
+                                        // Get total number of products with at least one like
+                                        $productsWithLikes = \App\Models\Product::has('likes')->count();
+                                        
+                                        // Calculate percentile (higher is better)
+                                        $percentile = $productsWithLikes > 0 
+                                            ? 100 - (($rank / $productsWithLikes) * 100) 
+                                            : 0;
+                                    }
+                                @endphp
+                                
+                                @if($thisProductLikes > 0)
+                                    <div class="mt-2">
+                                        <span class="badge bg-info text-dark">
+                                            <i class="bi bi-trophy"></i> 
+                                            @if(isset($rank) && isset($productsWithLikes))
+                                                Rank #{{ $rank }} of {{ $productsWithLikes }}
+                                                (Top {{ number_format($percentile, 1) }}%)
+                                            @else
+                                                First likes!
+                                            @endif
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                            
                             <div class="mb-4">
                                 <h5>Description</h5>
                                 <p>{{ $product->description }}</p>
@@ -115,8 +178,7 @@
                                 ->whereHas('items', function($query) use ($product) {
                                     $query->where('product_id', $product->id);
                                 })
-                                ->where('status', 'completed')
-                                ->exists();
+                                ->exists(); // Allow comments regardless of order status
                         @endphp
                         
                         @if($hasPurchased)
