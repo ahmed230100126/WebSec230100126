@@ -40,6 +40,9 @@ class ProductsController extends Controller {
 
 		$products = $query->get();
 
+		// Load comments for all products
+		$products->load('comments.user');
+
 		return view('products.list', compact('products'));
 	}
 

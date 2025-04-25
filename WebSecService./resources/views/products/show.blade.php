@@ -103,55 +103,60 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+                        <p class="text-muted">No reviews yet.</p>
                     @endif
                     
-                    <!-- Add Comment Form -->
+                    <!-- Comment Form - Only for customers who purchased the product -->
                     @auth
-                        <div class="mt-4">
-                            <h5>Write a Review</h5>
-                            <form action="{{ route('product.comments.store', $product) }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label class="form-label">Rating (optional)</label>
-                                    <div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="rating" id="rating1" value="1">
-                                            <label class="form-check-label" for="rating1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="rating" id="rating2" value="2">
-                                            <label class="form-check-label" for="rating2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="rating" id="rating3" value="3">
-                                            <label class="form-check-label" for="rating3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="rating" id="rating4" value="4">
-                                            <label class="form-check-label" for="rating4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="rating" id="rating5" value="5">
-                                            <label class="form-check-label" for="rating5">5</label>
-                                        </div>
+                        @php
+                            // Check if user has purchased this product
+                            $hasPurchased = auth()->user()
+                                ->orders()
+                                ->whereHas('items', function($query) use ($product) {
+                                    $query->where('product_id', $product->id);
+                                })
+                                ->where('status', 'completed')
+                                ->exists();
+                        @endphp
+                        
+                        @if($hasPurchased)
+                            <div class="mt-4 border-top pt-4">
+                                <h5>Write a Review</h5>
+                                <form action="{{ route('product.comments.store', $product) }}" method="POST">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="rating" class="form-label">Rating</label>
+                                        <select name="rating" id="rating" class="form-select" required>
+                                            <option value="">Select rating...</option>
+                                            <option value="5">5 - Excellent</option>
+                                            <option value="4">4 - Very Good</option>
+                                            <option value="3">3 - Good</option>
+                                            <option value="2">2 - Fair</option>
+                                            <option value="1">1 - Poor</option>
+                                        </select>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="comment" class="form-label">Your Comment</label>
-                                    <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-chat-left-text me-1"></i> Submit Review
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            Please <a href="{{ route('login') }}">login</a> to leave a review.
-                        </div>
+                                    <div class="mb-3">
+                                        <label for="comment" class="form-label">Your Review</label>
+                                        <textarea name="comment" id="comment" rows="4" class="form-control" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send me-1"></i> Submit Review
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     @endauth
+                    
+                    <!-- Comment Policy -->
+                    <div class="alert alert-info mt-4">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Review Policy:</strong> Only customers who have purchased this product can leave reviews.
+                        @auth
+                            If you've purchased this item, you can leave a review from your <a href="{{ route('orders.index') }}">orders page</a>.
+                        @else
+                            Please <a href="{{ route('login') }}">login</a> to view your orders and leave reviews on your purchases.
+                        @endauth
+                    </div>
                 </div>
             </div>
         </div>

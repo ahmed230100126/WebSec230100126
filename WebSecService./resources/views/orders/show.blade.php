@@ -71,6 +71,65 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Add a Reviews section to the order details -->
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5>Write a Review for Your Purchased Products</h5>
+                </div>
+                <div class="card-body">
+                    @if($order->status === 'completed')
+                        @foreach($order->items as $item)
+                            <div class="border-bottom pb-4 mb-4">
+                                <div class="d-flex mb-3">
+                                    <div class="me-3">
+                                        @if($item->product->photo)
+                                            <img src="{{ asset('storage/products/' . $item->product->photo) }}" 
+                                                class="img-fluid rounded" style="width: 80px;" alt="{{ $item->product->name }}">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">{{ $item->product->name }}</h6>
+                                        <p class="text-muted small mb-0">Quantity: {{ $item->quantity }}</p>
+                                        <p class="text-primary mb-0">${{ number_format($item->price, 2) }}</p>
+                                    </div>
+                                </div>
+
+                                <form action="{{ route('product.comments.store', $item->product) }}" method="POST">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="rating-{{ $item->id }}" class="form-label">Rating</label>
+                                        <select name="rating" id="rating-{{ $item->id }}" class="form-select" required>
+                                            <option value="">Select rating...</option>
+                                            <option value="5">5 - Excellent</option>
+                                            <option value="4">4 - Very Good</option>
+                                            <option value="3">3 - Good</option>
+                                            <option value="2">2 - Fair</option>
+                                            <option value="1">1 - Poor</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="comment-{{ $item->id }}" class="form-label">Your Review</label>
+                                        <textarea name="comment" id="comment-{{ $item->id }}" rows="3" class="form-control" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send me-1"></i> Submit Review
+                                    </button>
+                                </form>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            You can write reviews for products once your order is completed.
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <div class="col-lg-4">

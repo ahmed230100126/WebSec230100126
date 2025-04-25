@@ -41,8 +41,10 @@ Route::get('/reset-password/{token}', [App\Http\Controllers\PasswordResetControl
 Route::post('/reset-password', [App\Http\Controllers\PasswordResetController::class, 'reset'])
     ->name('password.update');
 
+// Product routes
 Route::get('products', [ProductsController::class, 'list'])->name('products_list');
 Route::get('products/{product}', [ProductsController::class, 'show'])->name('products.show');
+
 Route::middleware(['auth', 'role:Admin|Employee'])->group(function () {
     Route::get('products/edit/{product?}', [ProductsController::class, 'edit'])->name('products_edit');
     Route::post('products/save/{product?}', [ProductsController::class, 'save'])->name('products_save');
@@ -52,7 +54,7 @@ Route::middleware(['auth', 'role:Admin|Employee'])->group(function () {
 
 // Product comments
 Route::post('products/{product}/comments', [ProductCommentsController::class, 'store'])->name('product.comments.store');
-Route::delete('comments/{comment}', [ProductCommentsController::class, 'destroy'])->name('product.comments.destroy');
+Route::delete('/product/comments/{comment}', [ProductCommentsController::class, 'destroy'])->name('product.comments.destroy');
 
 Route::get('orders', [OrdersController::class, 'index'])->name('orders.index');
 Route::get('orders/{order}', [OrdersController::class, 'show'])->name('orders.show');

@@ -138,6 +138,53 @@
                                         </form>
                                     @endif
                                 </div>
+                                
+                                <!-- Product Comments Section -->
+                                <div class="col-12 mt-4 border-top pt-3">
+                                    <h5>Customer Reviews</h5>
+                                    
+                                    @if($product->comments->count() > 0)
+                                        <div class="mb-3">
+                                            @foreach($product->comments as $comment)
+                                                <div class="border-bottom pb-3 mb-3">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <div>
+                                                            <strong>{{ $comment->user->name }}</strong>
+                                                            <small class="text-muted ms-2">{{ $comment->created_at->diffForHumans() }}</small>
+                                                        </div>
+                                                        @auth
+                                                            @if(auth()->id() == $comment->user_id || auth()->user()->hasPermissionTo('delete_comments'))
+                                                                <form action="{{ route('product.comments.destroy', $comment) }}" method="POST">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                                            onclick="return confirm('Are you sure you want to delete this comment?')">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        @endauth
+                                                    </div>
+                                                    
+                                                    @if($comment->rating)
+                                                        <div class="mb-1">
+                                                            @for($i = 1; $i <= 5; $i++)
+                                                                @if($i <= $comment->rating)
+                                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                                @else
+                                                                    <i class="bi bi-star text-warning"></i>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
+                                                    @endif
+                                                    <p class="mb-0">{{ $comment->comment }}</p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <p class="text-muted">No reviews yet.</p>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     @empty

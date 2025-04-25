@@ -16,9 +16,22 @@ class ProductCommentsController extends Controller
     {
         $request->validate([
             'comment' => 'required|string|max:1000',
-            'rating' => 'nullable|integer|min:1|max:5',
+            'rating' => 'required|integer|min:1|max:5',
         ]);
+
+        // Check if user has purchased this product
+        $hasPurchased = auth()->user()
+            ->orders()
+            ->whereHas('items', function($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })
+            ->where('status', 'completed')
+            ->exists();
         
+        if (!$hasPurchased) {
+            return redirect()->back()->with('error', 'You can only review products you have purchased.');
+        }
+
         $comment = new ProductComment();
         $comment->product_id = $product->id;
         $comment->user_id = auth()->id();
