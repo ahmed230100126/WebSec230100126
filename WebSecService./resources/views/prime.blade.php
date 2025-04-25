@@ -2,14 +2,16 @@
 @section('title', 'Prime Numbers')
 @section('content')
   @php
-    function isPrime($number) {
-        if($number <= 1) return false;
-        $i = $number - 1;
-        while($i > 1) {
-            if($number % $i == 0) return false;
-            $i--;
+    if (!function_exists('isPrime')) {
+        function isPrime($number) {
+            if($number <= 1) return false;
+            $i = $number - 1;
+            while($i > 1) {
+                if($number % $i == 0) return false;
+                $i--;
+            }
+            return true;
         }
-        return true;
     }
   @endphp
 <div class="container py-5">
