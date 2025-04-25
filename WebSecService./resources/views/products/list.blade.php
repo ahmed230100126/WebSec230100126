@@ -121,7 +121,7 @@
                                             <button class="btn btn-outline-danger" disabled>Insufficient Credits</button>
                                         </div>
                                     @else
-                                        <form action="{{ route('orders_checkout') }}" method="post" class="mt-3">
+                                        <form action="{{ route('orders.place') }}" method="post" class="mt-3">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                                             <div class="d-flex align-items-center gap-2">

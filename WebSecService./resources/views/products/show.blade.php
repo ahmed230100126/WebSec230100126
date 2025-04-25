@@ -40,7 +40,7 @@
                             </div>
                             
                             @if($product->stock_quantity > 0)
-                                <form action="{{ route('orders_checkout') }}" method="post">
+                                <form action="{{ route('orders.place') }}" method="post">
                                     @csrf
                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                                     <div class="d-flex">
