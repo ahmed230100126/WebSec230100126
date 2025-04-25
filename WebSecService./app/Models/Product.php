@@ -60,4 +60,12 @@ class Product extends Model  {
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    /**
+     * Get the comments for this product.
+     */
+    public function comments()
+    {
+        return $this->hasMany(ProductComment::class);
+    }
 }

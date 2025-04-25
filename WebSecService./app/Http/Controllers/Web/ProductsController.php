@@ -98,4 +98,15 @@ class ProductsController extends Controller {
 	    return redirect()->route('products_list')
 	        ->with('success', "Stock for {$product->name} has been reset to 0.");
 	}
+
+	/**
+	 * Display a single product with comments
+	 */
+	public function show(Product $product) 
+	{
+		// Load the product with comments and their authors
+		$product->load(['comments.user']);
+		
+		return view('products.show', compact('product'));
+	}
 }
