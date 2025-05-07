@@ -38,6 +38,18 @@
                     </div>
                 </form>
 
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <strong>Search results for:</strong> <span id="search-keywords"></span>
+                    </div>
+                </div>
+                <script>
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const keywords = urlParams.get('keywords');
+                    document.getElementById('search-keywords').innerHTML = keywords;
+                </script>
+                
                 <!-- Product Grid -->
                 <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
                     @forelse($products as $product)
