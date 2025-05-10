@@ -164,3 +164,19 @@ Route::get('login/github', [App\Http\Controllers\UserController::class, 'redirec
     ->name('login.github');
 Route::get('login/github/callback', [App\Http\Controllers\UserController::class, 'handleGithubCallback']);
 
+Route::get('/cryptography', function (Request $request) {
+$data = $request->data??"Welcome to Cryptography";
+$action = $request->action??"Encrypt";
+$result = $request->result??"";
+$status = "Failed";
+
+if($request->action=="Encrypt") {
+    $temp = openssl_encrypt($request->data, 'aes-128-ecb', 'thisisasecretkey', OPENSSL_RAW_DATA, '');
+    if($temp) {
+        $status = 'Encrypted Successfully';
+        $result = base64_encode($temp);
+    }
+}
+
+return view('cryptography', compact('data', 'result', 'action', 'status'));
+})->name('cryptography');

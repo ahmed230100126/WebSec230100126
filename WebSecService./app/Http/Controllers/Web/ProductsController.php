@@ -21,17 +21,8 @@ class ProductsController extends Controller {
 
 		$query = Product::select("products.*");
 
-		
-		if ($request->keywords) {
-			 $rawProducts = DB::select("SELECT * FROM products WHERE name LIKE '%" . $request->keywords . "%'");
-			
-
-			$collection = collect($rawProducts);
-			$productIds = $collection->pluck('id')->toArray();
-			$products = Product::with('comments.user', 'likes')->whereIn('id', $productIds)->get();
-			
-			return view('products.list', compact('products'));
-		}
+		$query->when($request->keywords,
+		fn($q)=> $q->where("name", "like", "%$request->keywords%"));
 
 		$query->when($request->min_price,
 		fn($q)=> $q->where("price", ">=", $request->min_price));
