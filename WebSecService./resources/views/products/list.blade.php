@@ -37,12 +37,7 @@
                         </div>
                     </div>
                 </form>
-<<<<<<< HEAD
-                    
-                <!-- Products List -->
-=======
 
-                
                 <div class="card mb-4">
                     <div class="card-body">
                         <strong>Search results for:</strong> <span id="search-keywords"></span>
@@ -55,7 +50,6 @@
                 </script>
                 
                 <!-- Product Grid -->
->>>>>>> origin/main
                 <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
                     @forelse($products as $product)
                         <div class="col">
@@ -119,6 +113,15 @@
                                                 @endif
                                             @endif
                                         </div>
+
+                                        @if(auth()->user() && auth()->user()->hasPermissionTo('favorite_product'))
+                                            <form action="{{ route('products.toggle_favorite', $product) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm {{ $product->is_favorite ? 'btn-warning' : 'btn-outline-warning' }}">
+                                                    <i class="bi {{ $product->is_favorite ? 'bi-star-fill' : 'bi-star' }}"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                     
                                     <div class="d-flex align-items-center mt-2">

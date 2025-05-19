@@ -61,6 +61,9 @@ Route::delete('/product/comments/{comment}', [ProductCommentsController::class, 
 // Product likes
 Route::post('products/{product}/like', [ProductLikesController::class, 'toggleLike'])->name('products.like');
 
+// Product favorites
+Route::post('products/{product}/favorite', [ProductsController::class, 'toggleFavorite'])->name('products.toggle_favorite');
+
 Route::get('orders', [OrdersController::class, 'index'])->name('orders.index');
 Route::get('orders/{order}', [OrdersController::class, 'show'])->name('orders.show');
 Route::get('orders/{order}/delete', [OrdersController::class, 'delete'])->name('order_delete');

@@ -121,4 +121,20 @@ class ProductsController extends Controller {
 		
 		return view('products.show', compact('product'));
 	}
+
+	/**
+	 * Toggle favorite status for a product
+	 */
+	public function toggleFavorite(Product $product)
+	{
+		// Check if user has permission to favorite products
+		if(!auth()->user()->hasPermissionTo('favorite_product')) {
+			abort(403, 'Unauthorized action.');
+		}
+
+		$favorite = $product->toggleFavorite();
+		$message = $favorite ? 'Product added to favorites' : 'Product removed from favorites';
+
+		return redirect()->back()->with('success', $message);
+	}
 }

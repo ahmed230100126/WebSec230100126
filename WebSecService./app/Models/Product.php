@@ -21,6 +21,16 @@ class Product extends Model  {
         'price',
         'stock_quantity',
         'photo',
+        'favorite',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'favorite' => 'boolean',
     ];
 
     /**
@@ -87,5 +97,36 @@ class Product extends Model  {
         }
         
         return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    /**
+     * Get the users who favorited this product.
+     */
+    public function favorites()
+    {
+        return $this->belongsToMany(User::class, 'favorite', 'product_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if a product is favorited by a specific user
+     */
+    public function isFavoritedByUser($user = null)
+    {
+        if (!$user) {
+            return false;
+        }
+        
+        return $this->favorites()->where('user_id', $user->id)->exists();
+    }
+
+    /**
+     * Toggle the favorite status of the product
+     */
+    public function toggleFavorite()
+    {
+        $this->favorite = !$this->favorite;
+        $this->save();
+        return $this->favorite;
     }
 }
