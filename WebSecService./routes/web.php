@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\ProductsController;
 use App\Http\Controllers\Web\UsersController;
 use App\Http\Controllers\Web\GradeController;
-use App\Http\Controllers\Web\ExamController;
+// Comment out this line since the controller doesn't exist
+// use App\Http\Controllers\Web\ExamController;
 use App\Http\Controllers\Web\QuizController;
 use App\Http\Controllers\Web\SubmissionController;
 use App\Http\Controllers\Web\OrdersController;
@@ -80,9 +81,12 @@ Route::middleware(['auth', 'role:Admin|Employee'])->group(function () {
 
 Route::resource('grades', GradeController::class);
 
+// Comment out these exam routes until the controller is implemented
+/*
 Route::resource('exam', ExamController::class);
 Route::get('exam/start', [ExamController::class, 'start'])->name('exam.start');
 Route::post('exam/submit', [ExamController::class, 'submit'])->name('exam.submit');
+*/
 
 Route::middleware(['auth'])->group(function () {
     // Quiz routes
@@ -189,7 +193,7 @@ try {
         $status = 'Hashed Successfully';
     }
     else if($request->action=="Sign") {
-        $path = storage_path('app/private/useremail@domain.com.pfx');
+        $path = storage_path('app/certificates/useremail@domain.com.pfx');
         $password = '12345678';
         $certificates = [];
         if (file_exists($path)) {
@@ -210,7 +214,7 @@ try {
     }
     else if($request->action=="Verify") {
         $signature = base64_decode($request->result);
-        $path = storage_path('app/public/useremail@domain.com.crt');
+        $path = storage_path('app/certificates/useremail@domain.com.crt');
         if (file_exists($path)) {
             $publicKey = file_get_contents($path);
             if(openssl_verify($request->data, $signature, $publicKey, 'sha256')) {
@@ -221,7 +225,7 @@ try {
         }
     }
     else if($request->action=="KeySend") {
-        $path = storage_path('app/public/useremail@domain.com.crt');
+        $path = storage_path('app/certificates/useremail@domain.com.crt');
         if (file_exists($path)) {
             $publicKey = file_get_contents($path);
             $temp = '';
@@ -234,7 +238,7 @@ try {
         }
     }
     else if($request->action=="KeyRecive") {
-        $path = storage_path('app/private/useremail@domain.com.pfx');
+        $path = storage_path('app/certificates/useremail@domain.com.pfx');
         $password = '12345678';
         $certificates = [];
         if (file_exists($path)) {
